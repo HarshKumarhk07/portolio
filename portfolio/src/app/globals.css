@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050505;
+  --foreground: #ededed;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: inherit;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar - Dark Luxury Theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f1f1f;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2a2a2a;
+}
+
+/* Hide Unwanted Branding (Veo, Next.js, Vercel) */
+[data-veo],
+.veo-logo,
+video ~ *,
+[alt*="Next"],
+[title*="Vercel"],
+a[href*="nextjs"], 
+img[alt*="Next"], 
+.nextjs-badge {
+  display: none !important;
+}
+
+/* Utilities */
+.text-shadow-sm {
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
