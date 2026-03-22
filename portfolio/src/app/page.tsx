@@ -1,6 +1,7 @@
 "use client";
 
 import CharacterScrollScene from "@/components/CharacterScrollScene";
+import { InfiniteGridBackground } from "@/components/ui/infinite-grid";
 import { Github, Linkedin, Mail, Code2, Phone, ArrowRight, Download } from "lucide-react";
 import { motion, useScroll, useSpring } from "framer-motion";
 
@@ -42,8 +43,9 @@ export default function Home() {
       <CharacterScrollScene />
       
       {/* Global Wrapper */}
-      <div className="relative z-10 w-full min-h-screen bg-[#050505]">
-        <div className="relative z-10 flex flex-col items-center">
+      <InfiniteGridBackground>
+        <div className="relative z-10 w-full min-h-screen bg-transparent">
+          <div className="relative z-10 flex flex-col items-center">
             
           {/* SECTION 1: ABOUT / IDENTITY */}
           <section className="pt-[120px] pb-[120px] w-full relative">
@@ -375,7 +377,8 @@ export default function Home() {
           </section>
 
         </div>
-      </div>
+        </div>
+      </InfiniteGridBackground>
     </main>
   );
 }
