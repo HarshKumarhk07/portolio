@@ -33,7 +33,7 @@ export const InfiniteGridBackground = ({ children }: { children: React.ReactNode
       {/* Background Grid Layer (Dim) */}
       <div 
         className="absolute inset-0 pointer-events-none z-0"
-        style={{ opacity: 0.1 }}
+        style={{ opacity: 0.12 }}
       >
         <GridPattern offset={offset} gridSize={gridSize} />
       </div>
@@ -42,7 +42,7 @@ export const InfiniteGridBackground = ({ children }: { children: React.ReactNode
       <div 
         className="absolute inset-0 pointer-events-none z-[1]"
         style={{
-          opacity: 0.6,
+          opacity: 0.45,
           maskImage: `radial-gradient(250px circle at ${mousePosition.x}px ${mousePosition.y}px, black, transparent)`,
           WebkitMaskImage: `radial-gradient(250px circle at ${mousePosition.x}px ${mousePosition.y}px, black, transparent)`
         }}
@@ -61,7 +61,7 @@ export const InfiniteGridBackground = ({ children }: { children: React.ReactNode
 const GridPattern = ({ offset, gridSize }: { offset: number; gridSize: number }) => {
   return (
     <div className="absolute inset-0 w-full h-full">
-      <svg className="absolute inset-0 w-full h-full" style={{ color: 'rgba(59,130,246,0.8)' }}>
+      <svg className="absolute inset-0 w-full h-full" style={{ color: 'rgba(59,130,246,0.6)' }}>
         <defs>
           <pattern
             id="infinite-grid-pattern"

@@ -2,6 +2,7 @@
 
 import CharacterScrollScene from "@/components/CharacterScrollScene";
 import { InfiniteGridBackground } from "@/components/ui/infinite-grid";
+import { FloatingIconsHero } from "@/components/ui/floating-icons-hero-section";
 import { Github, Linkedin, Mail, Code2, Phone, ArrowRight, Download } from "lucide-react";
 import { motion, useScroll, useSpring } from "framer-motion";
 
@@ -123,9 +124,9 @@ export default function Home() {
           </section>
 
           {/* SECTION 2: SKILLS */}
-          <section className="py-[60px] md:py-[80px] w-full border-t border-white/[0.05]">
-            <div className="max-w-[1200px] mx-auto px-6 md:px-12">
-              <Reveal className="flex flex-col md:flex-row gap-8 md:gap-24 items-start w-full relative mb-20">
+          <section className="relative py-[60px] md:py-[80px] border-t border-white/[0.05] w-full overflow-hidden">
+            <div className="max-w-[1200px] mx-auto px-6 md:px-12 mb-4">
+              <Reveal className="flex flex-col md:flex-row gap-8 md:gap-24 items-start w-full relative mb-12">
                 <div className="w-full md:w-[40%] relative flex items-start md:h-full min-h-[160px]">
                    <span className="font-black text-8xl md:text-[140px] text-blue-500/10 select-none pointer-events-none leading-none -ml-4 md:-ml-8">
                      02
@@ -138,36 +139,16 @@ export default function Home() {
                   <h2 className="text-white font-black text-5xl md:text-6xl tracking-tighter leading-[1.1] whitespace-pre-line">
                     {"Technology\nArsenal."}
                   </h2>
+                  <p className="text-white/40 text-sm md:text-base mt-6 font-light">
+                    Hover to interact — these are the core tools and languages I build with.
+                  </p>
                 </div>
               </Reveal>
-
-              <div className="flex flex-col w-full">
-                {[
-                  { cat: "LANGUAGES", items: ["Java", "Python", "C++", "PHP"] },
-                  { cat: "FRONTEND", items: ["React", "JavaScript", "Tailwind CSS", "HTML5", "CSS"] },
-                  { cat: "BACKEND", items: ["Node.js", "Express", "PHP", "REST APIs"] },
-                  { cat: "DATA", items: ["MongoDB", "MySQL"] },
-                  { cat: "TOOLS", items: ["Git", "GitHub", "Postman", "XAMPP", "phpMyAdmin"] },
-                  { cat: "EXPERTISE", items: ["DSA", "ML Integration", "Responsive Design", "Scripting"] }
-                ].map((row, rIdx) => (
-                  <Reveal key={rIdx} delay={rIdx * 0.05} className="flex flex-col md:flex-row items-start md:items-center border-b border-white/5 py-8 md:py-6 group transition-all duration-300 hover:bg-white/[0.02]">
-                    <div className="w-full md:w-48 shrink-0 flex items-center pr-6 mb-4 md:mb-0">
-                      <span className="text-white/20 tracking-[0.3em] text-[10px] uppercase font-bold">
-                        {row.cat}
-                      </span>
-                    </div>
-                    <div className="hidden md:block w-px h-8 bg-white/10 mr-8 flex-shrink-0" />
-                    <div className="flex flex-wrap gap-3">
-                      {row.items.map((skill, sIdx) => (
-                        <span key={sIdx} className="text-white/80 font-medium text-[13px] px-5 py-2.5 bg-white/5 rounded-full">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
             </div>
+            
+            <Reveal delay={0.2} className="relative h-[450px] md:h-[600px] w-full max-w-[1400px] mx-auto">
+              <FloatingIconsHero className="h-full bg-transparent" />
+            </Reveal>
           </section>
 
           {/* SECTION 3: PROJECTS */}
