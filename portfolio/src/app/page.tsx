@@ -7,22 +7,6 @@ import CharacterScrollScene from "@/components/CharacterScrollScene";
 import { InfiniteGridBackground } from "@/components/ui/infinite-grid";
 import { FloatingIconsHero } from "@/components/ui/floating-icons-hero-section";
 
-const ScrollProgress = () => {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-600 via-cyan-400 to-purple-500 origin-left z-[9999] shadow-[0_0_20px_rgba(34,211,238,0.8)] rounded-r-full"
-      style={{ scaleX }}
-    />
-  );
-};
-
 const Reveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, className?: string }) => (
   <motion.div
     initial={{ opacity: 0, y: 40 }}
@@ -37,10 +21,7 @@ const Reveal = ({ children, delay = 0, className = "" }: { children: React.React
 
 export default function Home() {
   return (
-    <main className="relative w-full bg-[#050505] text-[#ededed] scroll-smooth">
-      {/* Cinematic Global Scroll Indicator */}
-      <ScrollProgress />
-      
+    <main id="home" className="relative w-full bg-[#050505] text-[#ededed] scroll-smooth">
       {/* 3D Cinematic Scroll Experience (Untouched) */}
       <div className="w-full">
         <CharacterScrollScene />
@@ -52,7 +33,7 @@ export default function Home() {
           <div className="relative z-10 flex flex-col items-center">
             
           {/* SECTION 1: ABOUT / IDENTITY */}
-          <section className="pt-[120px] pb-[120px] w-full relative">
+          <section id="about" className="pt-[120px] pb-[120px] w-full relative">
             <div className="max-w-[1200px] mx-auto px-6 md:px-12 flex flex-col md:flex-row gap-8 md:gap-24 relative">
               <Reveal className="w-full md:w-[40%] relative flex flex-col justify-start items-start md:h-full min-h-[160px] gap-8 md:gap-10">
                  <div className="relative">
@@ -127,7 +108,7 @@ export default function Home() {
           </section>
 
           {/* SECTION 2: SKILLS */}
-          <section className="relative py-[60px] md:py-[80px] border-t border-white/[0.05] w-full overflow-hidden">
+          <section id="skills" className="relative py-[60px] md:py-[80px] border-t border-white/[0.05] w-full overflow-hidden">
             <div className="max-w-[1200px] mx-auto px-6 md:px-12 mb-4">
               <Reveal className="flex flex-col md:flex-row gap-8 md:gap-24 items-start w-full relative mb-12">
                 <div className="w-full md:w-[40%] relative flex items-start md:h-full min-h-[160px]">
@@ -155,7 +136,7 @@ export default function Home() {
           </section>
 
           {/* SECTION 3: PROJECTS */}
-          <section className="py-[60px] md:py-[80px] w-full border-t border-white/[0.05]">
+          <section id="projects" className="py-[60px] md:py-[80px] w-full border-t border-white/[0.05]">
             <div className="max-w-[1200px] mx-auto px-6 md:px-12 relative">
               <Reveal className="flex flex-col md:flex-row gap-8 md:gap-24 items-start w-full relative mb-20">
                 <div className="w-full md:w-[40%] relative flex items-start md:h-full min-h-[160px]">
@@ -243,7 +224,7 @@ export default function Home() {
           </section>
 
           {/* SECTION 4: TRAINING & CREDENTIALS */}
-          <section className="py-[60px] md:py-[80px] w-full border-t border-white/[0.05]">
+          <section id="training" className="py-[60px] md:py-[80px] w-full border-t border-white/[0.05]">
             <div className="max-w-[1200px] mx-auto px-6 md:px-12 flex flex-col items-start relative mb-20">
                <Reveal className="absolute top-0 right-12 z-0 hidden lg:block">
                  <span className="font-black text-[240px] text-blue-500/5 select-none pointer-events-none leading-none origin-bottom translate-y-[-20%]">
@@ -302,7 +283,7 @@ export default function Home() {
           </section>
 
           {/* SECTION 5: NCC / BEYOND CODE */}
-          <section className="py-[120px] md:py-[160px] w-full border-t border-white/[0.05] relative overflow-hidden">
+          <section id="activities" className="py-[120px] md:py-[160px] w-full border-t border-white/[0.05] relative overflow-hidden">
             <Reveal className="max-w-[1200px] mx-auto px-6 md:px-12 flex flex-col items-center justify-center relative">
               <span className="absolute top-[-60px] md:top-[-80px] left-4 md:left-24 font-black text-[180px] md:text-[240px] leading-none select-none pointer-events-none font-serif text-blue-500/10">
                 &quot;
@@ -324,7 +305,7 @@ export default function Home() {
           </section>
 
           {/* SECTION 6: CONTACT CTA */}
-          <section className="min-h-[70vh] w-full flex flex-col items-center justify-center relative border-t border-white/[0.08]">
+          <section id="contact" className="min-h-[70vh] w-full flex flex-col items-center justify-center relative border-t border-white/[0.08]">
             <div className="flex flex-col items-center justify-center w-full px-6 z-10 mt-16 pb-32">
               <Reveal>
                 <span className="text-blue-400 tracking-[0.4em] text-[10px] md:text-xs uppercase font-bold mb-8 block text-center">READY TO BUILD</span>
