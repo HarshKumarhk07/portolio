@@ -6,6 +6,28 @@ import { Github, Linkedin, Mail, ArrowRight } from "lucide-react";
 
 const FRAME_COUNT = 102;
 
+const remapProgress = (p: number): number => {
+  if (p < 0.6) {
+    // First 60% of scroll = first 70% of frames — slightly faster at start
+    return p * (0.70 / 0.6);
+  } else if (p < 0.85) {
+    // 60%-85% of scroll = frames 70%-82% — normal speed middle section
+    const t = (p - 0.6) / 0.25;
+    return 0.70 + t * 0.12;
+  } else {
+    // 85%-100% of scroll = frames 82%-100% — VERY SLOW, user sees hands closing
+    const t = (p - 0.85) / 0.15;
+    return 0.82 + t * 0.18;
+  }
+};
+
+const FINAL_FRAME = FRAME_COUNT - 1;
+
+const getDisplayFrame = (p: number): number => {
+  if (p >= 0.88) return FINAL_FRAME;
+  const remapped = remapProgress(p);
+  return Math.min(Math.floor(remapped * FRAME_COUNT), FINAL_FRAME);
+};
 const BEATS = [
   {
     label: "Full Stack Developer",
@@ -161,25 +183,40 @@ function TextBeat({ beat, progress }: { beat: typeof BEATS[0], progress: MotionV
   );
 }
 
-export default function CharacterScrollScene() {
+interface CharacterScrollSceneProps {
+  onAnimationComplete?: () => void;
+  scrollYProgress?: MotionValue<number>;
+}
+
+export default function CharacterScrollScene({ onAnimationComplete }: CharacterScrollSceneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [images, setImages] = useState<HTMLImageElement[]>([]);
+  const [images, setImages] = useState<(HTMLImageElement | ImageBitmap)[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
+  const lastFrameIndex = useRef<number>(-1);
+  // FIX 1 — Scroll-driven RAF state
+  const isActiveRef = useRef(false);
+  const lastRenderedFrameRef = useRef(-1);
+  const settleTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const rafIdRef = useRef<number>(0);
+  // FIX 4 — JS scroll hold at final pose
+  const hasHeldRef = useRef(false);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
 
+  // FIX 2 — Cinematic spring: heavy damping kills micro-drift & overshoot
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
+    stiffness: 55,
+    damping: 90,
+    restDelta: 0.0003
   });
 
   const indicatorOpacity = useTransform(smoothProgress, [0, 0.1], [1, 0]);
+  const endIndicatorOpacity = useTransform(smoothProgress, [0.85, 0.92], [0, 1]);
 
   useEffect(() => {
     let unmounted = false;
@@ -208,7 +245,11 @@ export default function CharacterScrollScene() {
       await Promise.all(promises);
       
       if (!unmounted) {
-        setImages(imgArray);
+        // Convert to ImageBitmaps for high-performance drawing
+        const bitmaps = await Promise.all(
+          imgArray.map(img => img ? createImageBitmap(img) : null)
+        );
+        setImages(bitmaps.filter((b): b is ImageBitmap => b !== null));
         setTimeout(() => setLoaded(true), 500);
       }
     };
@@ -217,41 +258,48 @@ export default function CharacterScrollScene() {
     return () => { unmounted = true; };
   }, []);
 
-  const drawImage = (index: number) => {
+  const drawImage = (index1: number, index2: number = index1, alpha: number = 0) => {
     if (!canvasRef.current || images.length === 0) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const img = images[index];
-    if (!img) return;
+    const img1 = images[index1];
+    const img2 = images[index2];
+    if (!img1 || !img2) return;
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
     const cropPercent = 0.08; 
-    const sourceHeight = img.height * (1 - cropPercent);
+    const sourceHeight = img1.height * (1 - cropPercent);
 
-    const hRatio = canvas.width / img.width;
+    const hRatio = canvas.width / img1.width;
     const vRatio = canvas.height / sourceHeight;
     const ratio = Math.min(hRatio, vRatio);
     
-    const centerShift_x = (canvas.width - img.width * ratio) / 2;
+    const centerShift_x = (canvas.width - img1.width * ratio) / 2;
     const centerShift_y = (canvas.height - sourceHeight * ratio) / 2;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Draw first frame
+    ctx.globalAlpha = 1;
     ctx.drawImage(
-      img,
-      0, 
-      0, 
-      img.width, 
-      sourceHeight, 
-      centerShift_x, 
-      centerShift_y, 
-      img.width * ratio, 
-      sourceHeight * ratio 
+      img1,
+      0, 0, img1.width, sourceHeight, 
+      centerShift_x, centerShift_y, img1.width * ratio, sourceHeight * ratio 
     );
+
+    // Draw second frame with alpha if needed for cross-fade smoothing
+    if (alpha > 0.01 && index1 !== index2) {
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(
+        img2,
+        0, 0, img2.width, sourceHeight, 
+        centerShift_x, centerShift_y, img2.width * ratio, sourceHeight * ratio 
+      );
+    }
   };
 
   useEffect(() => {
@@ -262,14 +310,80 @@ export default function CharacterScrollScene() {
     return () => window.removeEventListener("resize", handleResize);
   }, [loaded, images, smoothProgress]);
 
-  useMotionValueEvent(smoothProgress, "change", (latest) => {
-    if (!loaded) return;
-    const frameIndex = Math.max(0, Math.min(FRAME_COUNT - 1, Math.floor(latest * (FRAME_COUNT - 1))));
-    drawImage(frameIndex);
-  });
+  // Notify parent when animation is effectively complete (95%+)
+  useEffect(() => {
+    const unsubscribe = smoothProgress.on("change", (latest) => {
+      if (latest >= 0.95 && onAnimationComplete) {
+        onAnimationComplete();
+      }
+    });
+    return unsubscribe;
+  }, [smoothProgress, onAnimationComplete]);
+
+  // FIX 1 — Scroll-driven RAF: only renders while scroll is active, completely idles otherwise
+  useEffect(() => {
+    if (!loaded || images.length === 0) return;
+
+    const scheduleRender = () => {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = requestAnimationFrame(() => {
+        const rawProgress = smoothProgress.get();
+        const exactFrame = rawProgress * (FRAME_COUNT - 1);
+        const frameIndex = getDisplayFrame(rawProgress);
+        const nextFrameIndex = Math.min(FRAME_COUNT - 1, frameIndex + 1);
+
+        // FIX 5 — Velocity-aware alpha: crisp at high speed, smooth at low speed
+        const velocity = Math.abs(scrollYProgress.getVelocity());
+        const maxAlpha = velocity > 0.8 ? 0.3 : 1.0;
+        const alpha = Math.min(exactFrame - Math.floor(exactFrame), maxAlpha);
+
+        // Only redraw if frame actually changed — eliminates jitter
+        if (frameIndex !== lastRenderedFrameRef.current) {
+          drawImage(frameIndex, nextFrameIndex, alpha);
+          lastRenderedFrameRef.current = frameIndex;
+        }
+      });
+    };
+
+    // Wake up renderer on every scroll change, then settle after 350ms of idle
+    const wakeUp = (v: number) => {
+      isActiveRef.current = true;
+      clearTimeout(settleTimerRef.current);
+      scheduleRender();
+
+      // FIX 4 — JS scroll hold: lock scroll for 700ms at final hero pose
+      if (v >= 0.90 && !hasHeldRef.current) {
+        hasHeldRef.current = true;
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => { document.body.style.overflow = ''; }, 700);
+      }
+
+      settleTimerRef.current = setTimeout(() => {
+        isActiveRef.current = false;
+      }, 350);
+    };
+
+    const unsubscribe = smoothProgress.on('change', wakeUp);
+    // Draw current frame immediately on mount
+    scheduleRender();
+
+    return () => {
+      unsubscribe();
+      cancelAnimationFrame(rafIdRef.current);
+      clearTimeout(settleTimerRef.current);
+      document.body.style.overflow = '';
+    };
+  }, [loaded, images, smoothProgress, scrollYProgress]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-[400vh] bg-[#050505]">
+    <div ref={containerRef} className="relative w-full h-[550vh] bg-[#050505] snap-y snap-mandatory">
+      {/* FIX 3 — Snap points redistributed across full 550vh for meaningful story-beat pauses */}
+      <div className="absolute top-0 w-full h-screen pointer-events-none snap-start" />
+      <div className="absolute top-[110vh] w-full h-screen pointer-events-none snap-start" />
+      <div className="absolute top-[220vh] w-full h-screen pointer-events-none snap-start" />
+      <div className="absolute top-[350vh] w-full h-screen pointer-events-none snap-start" />
+      <div className="absolute top-[460vh] w-full h-screen pointer-events-none snap-start" />
+
       {/* Loading Overlay */}
       {!loaded && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050505] transition-opacity duration-1000">
@@ -310,6 +424,18 @@ export default function CharacterScrollScene() {
           >
             <span className="text-xs uppercase tracking-[0.2em] text-white/50 mb-2">Scroll To Explore</span>
             <div className="w-[1px] h-12 bg-gradient-to-b from-white/50 to-transparent rounded-full animate-pulse" />
+          </motion.div>
+        )}
+        {loaded && (
+          <motion.div
+            style={{ opacity: endIndicatorOpacity }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none z-50"
+          >
+            <motion.div
+              animate={{ y: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.2 }}
+              className="w-px h-8 bg-gradient-to-b from-blue-400/50 to-transparent"
+            />
           </motion.div>
         )}
 

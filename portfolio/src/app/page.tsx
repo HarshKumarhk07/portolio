@@ -1,10 +1,11 @@
 "use client";
 
+import { Github, Linkedin, Mail, Code2, Phone, ArrowRight, Download } from "lucide-react";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+
 import CharacterScrollScene from "@/components/CharacterScrollScene";
 import { InfiniteGridBackground } from "@/components/ui/infinite-grid";
 import { FloatingIconsHero } from "@/components/ui/floating-icons-hero-section";
-import { Github, Linkedin, Mail, Code2, Phone, ArrowRight, Download } from "lucide-react";
-import { motion, useScroll, useSpring } from "framer-motion";
 
 const ScrollProgress = () => {
   const { scrollYProgress } = useScroll();
@@ -36,16 +37,18 @@ const Reveal = ({ children, delay = 0, className = "" }: { children: React.React
 
 export default function Home() {
   return (
-    <main className="relative w-full bg-[#050505] text-[#ededed]">
+    <main className="relative w-full bg-[#050505] text-[#ededed] scroll-smooth">
       {/* Cinematic Global Scroll Indicator */}
       <ScrollProgress />
       
       {/* 3D Cinematic Scroll Experience (Untouched) */}
-      <CharacterScrollScene />
+      <div className="w-full">
+        <CharacterScrollScene />
+      </div>
       
       {/* Global Wrapper */}
       <InfiniteGridBackground>
-        <div className="relative z-10 w-full min-h-screen bg-transparent">
+        <div className="relative z-10 w-full bg-transparent">
           <div className="relative z-10 flex flex-col items-center">
             
           {/* SECTION 1: ABOUT / IDENTITY */}
@@ -356,8 +359,7 @@ export default function Home() {
               HARSH KUMAR SINGH <span className="mx-2 md:mx-4">·</span> MERN DEVELOPER <span className="mx-2 md:mx-4">·</span> LPU <span className="mx-2 md:mx-4">·</span> 2025
             </motion.div>
           </section>
-
-        </div>
+          </div>
         </div>
       </InfiniteGridBackground>
     </main>

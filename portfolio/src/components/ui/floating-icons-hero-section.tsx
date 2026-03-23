@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import React, { useRef, useEffect } from "react";
+import { motion, useAnimationFrame } from "framer-motion";
 
 const IconReact = (props: any) => (
   <svg {...props} viewBox="0 0 24 24" fill="none">
@@ -110,79 +111,146 @@ const IconCpp = (props: any) => (
   </svg>
 )
 
+const IconCSS = (props: any) => (
+  <svg {...props} viewBox="0 0 24 24" fill="#1572B6">
+    <path d="M4 3l1.5 16.5L12 21l6.5-1.5L20 3H4zm13 4H7.5l.25 2.5H16.5l-.5 5H11l-.25-2.5h3.5l.25-2.5H8.5 l.75 7.5L12 18l3.25-.5.5-4.5H9.5l-.25-2.5H17l-.5-5z"/>
+  </svg>
+)
+
 const techIcons = [
-  // Row 1 - Languages
-  { id: 1, icon: IconJava, className: 'top-[8%] left-[8%]' },
-  { id: 2, icon: IconPython, className: 'top-[10%] left-[28%]' },
-  { id: 3, icon: IconCpp, className: 'top-[6%] right-[28%]' },
-  { id: 4, icon: IconPHP, className: 'top-[8%] right-[8%]' },
-  
-  // Row 2 - Frontend
-  { id: 5, icon: IconReact, className: 'top-[30%] left-[5%]' },
-  { id: 6, icon: IconJavaScript, className: 'top-[25%] left-[22%]' },
-  { id: 7, icon: IconTailwind, className: 'top-[28%] right-[22%]' },
-  { id: 8, icon: IconHTML, className: 'top-[30%] right-[5%]' },
-  
-  // Row 3 - Backend & DB
-  { id: 9, icon: IconNodeJS, className: 'top-[50%] left-[8%]' },
-  { id: 10, icon: IconExpress, className: 'top-[48%] left-[25%]' },
-  { id: 11, icon: IconMongoDB, className: 'top-[50%] right-[25%]' },
-  { id: 12, icon: IconMySQL, className: 'top-[48%] right-[8%]' },
-  
-  // Row 4 - Tools
-  { id: 13, icon: IconGit, className: 'bottom-[20%] left-[12%]' },
-  { id: 14, icon: IconGitHub, className: 'bottom-[22%] left-[30%]' },
-  { id: 15, icon: IconPostman, className: 'bottom-[20%] right-[30%]' },
-  { id: 16, icon: IconVSCode, className: 'bottom-[22%] right-[12%]' },
-  
-  // Bottom extras
-  { id: 17, icon: IconPython, className: 'bottom-[8%] left-[20%]' },
-  { id: 18, icon: IconReact, className: 'bottom-[6%] right-[20%]' },
+  { id: 1,  icon: IconJava,       name: 'Java',       
+    className: 'top-[8%] left-[15%]' },
+  { id: 2,  icon: IconPython,     name: 'Python',     
+    className: 'top-[5%] left-[42%]' },
+  { id: 3,  icon: IconCpp,        name: 'C++',        
+    className: 'top-[10%] left-[65%]' },
+  { id: 4,  icon: IconPHP,        name: 'PHP',        
+    className: 'top-[8%] left-[85%]' },
+  { id: 5,  icon: IconReact,      name: 'React',      
+    className: 'top-[28%] left-[8%]' },
+  { id: 6,  icon: IconJavaScript, name: 'JavaScript', 
+    className: 'top-[22%] left-[32%]' },
+  { id: 7,  icon: IconTailwind,   name: 'Tailwind',   
+    className: 'top-[18%] left-[55%]' },
+  { id: 8,  icon: IconHTML,       name: 'HTML5',      
+    className: 'top-[30%] left-[75%]' },
+  { id: 9,  icon: IconNodeJS,     name: 'Node.js',    
+    className: 'top-[45%] left-[20%]' },
+  { id: 10, icon: IconExpress,    name: 'Express',    
+    className: 'top-[40%] left-[45%]' },
+  { id: 11, icon: IconMongoDB,    name: 'MongoDB',    
+    className: 'top-[48%] left-[68%]' },
+  { id: 12, icon: IconMySQL,      name: 'MySQL',      
+    className: 'top-[35%] left-[88%]' },
+  { id: 13, icon: IconGit,        name: 'Git',        
+    className: 'top-[65%] left-[12%]' },
+  { id: 14, icon: IconGitHub,     name: 'GitHub',     
+    className: 'top-[62%] left-[35%]' },
+  { id: 15, icon: IconPostman,    name: 'Postman',    
+    className: 'top-[68%] left-[58%]' },
+  { id: 16, icon: IconVSCode,     name: 'VS Code',    
+    className: 'top-[60%] left-[80%]' },
+  { id: 17, icon: IconCSS,        name: 'CSS3',       
+    className: 'top-[82%] left-[25%]' },
+  { id: 18, icon: IconJavaScript, name: 'Scripting',  
+    className: 'top-[78%] left-[52%]' },
 ];
 
-export function FloatingIconsHero({ className = "" }: { className?: string; title?: string; subtitle?: string; ctaText?: string; ctaHref?: string; icons?: any[] }) {
+const FloatingIcon = ({ item, mouseX, mouseY }: { item: any, mouseX: React.MutableRefObject<number>, mouseY: React.MutableRefObject<number> }) => {
+  const iconRef = useRef<HTMLDivElement>(null);
+  const pos = useRef({ x: 0, y: 0 });
+  const vel = useRef({ x: 0, y: 0 });
+  
+  // Random float params
+  const floatOffset = useRef(Math.random() * 1000);
+  const floatSpeed = useRef(0.001 + Math.random() * 0.001);
+  const floatAmp = useRef(10 + Math.random() * 20);
+
+  useAnimationFrame((t) => {
+    if (!iconRef.current) return;
+    
+    // 1. Get base position from className (rough center of the screen-percentages)
+    // For simplicity, we track the 'delta' from its CSS position
+    
+    const rect = iconRef.current.getBoundingClientRect();
+    const iconCenterX = rect.left + rect.width / 2;
+    const iconCenterY = rect.top + rect.height / 2;
+    
+    const dx = iconCenterX - mouseX.current;
+    const dy = iconCenterY - mouseY.current;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    
+    const repelRadius = 200;
+    const repelStrength = 0.5;
+    
+    let targetX = 0;
+    let targetY = 0;
+    
+    if (dist < repelRadius) {
+      const force = (repelRadius - dist) / repelRadius;
+      targetX = (dx / dist) * force * 50 * repelStrength;
+      targetY = (dy / dist) * force * 50 * repelStrength;
+    }
+    
+    // Smooth lerp to target (repel)
+    pos.current.x += (targetX - pos.current.x) * 0.1;
+    pos.current.y += (targetY - pos.current.y) * 0.1;
+    
+    // Add floating ambient motion
+    const floatY = Math.sin(t * floatSpeed.current + floatOffset.current) * floatAmp.current;
+    
+    iconRef.current.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y + floatY}px, 0)`;
+  });
+
+  const Icon = item.icon;
   return (
-    <div className={`relative w-full overflow-hidden ${className}`}>
+    <div
+      ref={iconRef}
+      className={`absolute ${item.className} group z-10 will-change-transform`}
+    >
+      <div className="flex flex-col items-center gap-1.5">
+        <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white/[0.08] backdrop-blur-sm border border-white/25 hover:bg-blue-500/10 hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.25)] transition-all duration-300 cursor-default">
+          <Icon className="w-8 h-8 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
+        </div>
+        <span className="text-white/50 text-[10px] tracking-[0.15em] font-medium uppercase whitespace-nowrap">
+          {item.name}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export function FloatingIconsHero({ className = "" }: { className?: string }) {
+  const mouseX = useRef(0);
+  const mouseY = useRef(0);
+  
+  // FIX 3 — THROTTLE MOUSEMOVE
+  let ticking = false;
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (ticking) return;
+    requestAnimationFrame(() => {
+      mouseX.current = e.clientX;
+      mouseY.current = e.clientY;
+      ticking = false;
+    });
+    ticking = true;
+  };
+
+  return (
+    <div 
+      className={`relative w-full h-full overflow-hidden ${className}`}
+      onMouseMove={handleMouseMove}
+    >
       {/* Desktop Floating Layout */}
       <div className="hidden md:block w-full h-full relative">
-        {techIcons.map((item, index) => {
-          const Icon = item.icon;
-          const randomY = Math.random() * 20 + 10;
-          const randomDuration = Math.random() * 3 + 4;
-          const randomDelay = Math.random() * 2;
-          
-          return (
-            <motion.div
-              key={item.id}
-              className={`absolute ${item.className} group z-10 flex`}
-              initial={{ opacity: 0, scale: 0.5 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{
-                duration: 0.8,
-                delay: index * 0.05,
-                ease: "easeOut",
-              }}
-            >
-              <motion.div
-                animate={{ 
-                  y: [0, -randomY, 0],
-                  rotate: [0, Math.random() * 10 - 5, 0]
-                }}
-                transition={{
-                  duration: randomDuration,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  ease: "easeInOut",
-                  delay: randomDelay,
-                }}
-                className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-blue-500/40 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300 cursor-default"
-              >
-                <Icon className="w-8 h-8 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
-              </motion.div>
-            </motion.div>
-          );
-        })}
+        {techIcons.map((item) => (
+          <FloatingIcon 
+            key={item.id} 
+            item={item} 
+            mouseX={mouseX} 
+            mouseY={mouseY} 
+          />
+        ))}
       </div>
 
       {/* Mobile Grid Layout Fallback */}
@@ -196,9 +264,14 @@ export function FloatingIconsHero({ className = "" }: { className?: string; titl
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
                transition={{ delay: index * 0.05 }}
-               className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10"
+               className="flex flex-col items-center gap-1.5"
              >
-               <Icon className="w-8 h-8 opacity-80" />
+               <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-white/[0.08] backdrop-blur-sm border border-white/25">
+                 <Icon className="w-8 h-8 opacity-80" />
+               </div>
+               <span className="text-white/50 text-[10px] tracking-[0.15em] font-medium uppercase">
+                 {item.name}
+               </span>
              </motion.div>
            )
          })}
