@@ -6,6 +6,8 @@ import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import CharacterScrollScene from "@/components/CharacterScrollScene";
 import { InfiniteGridBackground } from "@/components/ui/infinite-grid";
 import { FloatingIconsHero } from "@/components/ui/floating-icons-hero-section";
+import { ProjectCarousel } from "@/components/ui/project-carousel";
+import { PROJECTS } from "@/data/projects";
 
 const Reveal = ({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, className?: string }) => (
   <motion.div
@@ -40,7 +42,7 @@ export default function Home() {
                    <span className="absolute left-0 top-16 -translate-x-[60%] -rotate-90 text-white/10 tracking-[0.4em] text-[10px] uppercase font-semibold whitespace-nowrap hidden md:block">
                      ABOUT
                    </span>
-                   <span className="font-black text-8xl md:text-[140px] select-none pointer-events-none leading-none -ml-4 md:-ml-8 text-blue-500/20">
+                   <span className="font-black text-8xl md:text-[140px] select-none pointer-events-none leading-none -ml-4 md:-ml-8 text-blue-500/[0.25]">
                      01
                    </span>
                  </div>
@@ -112,7 +114,7 @@ export default function Home() {
             <div className="max-w-[1200px] mx-auto px-6 md:px-12 mb-4">
               <Reveal className="flex flex-col md:flex-row gap-8 md:gap-24 items-start w-full relative mb-12">
                 <div className="w-full md:w-[40%] relative flex items-start md:h-full min-h-[160px]">
-                   <span className="font-black text-8xl md:text-[140px] text-blue-500/10 select-none pointer-events-none leading-none -ml-4 md:-ml-8">
+                   <span className="font-black text-8xl md:text-[140px] text-blue-500/[0.15] select-none pointer-events-none leading-none -ml-4 md:-ml-8">
                      02
                    </span>
                 </div>
@@ -135,99 +137,40 @@ export default function Home() {
             </Reveal>
           </section>
 
-          {/* SECTION 3: PROJECTS */}
-          <section id="projects" className="py-[60px] md:py-[80px] w-full border-t border-white/[0.05]">
-            <div className="max-w-[1200px] mx-auto px-6 md:px-12 relative">
-              <Reveal className="flex flex-col md:flex-row gap-8 md:gap-24 items-start w-full relative mb-20">
-                <div className="w-full md:w-[40%] relative flex items-start md:h-full min-h-[160px]">
-                   <span className="font-black text-8xl md:text-[140px] text-blue-500/10 select-none pointer-events-none leading-none -ml-4 md:-ml-8">
-                     03
-                   </span>
-                </div>
-                <div className="w-full md:w-[60%] pt-4">
+          {/* SECTION 3: PROJECTS (Dark Glass Carousel) */}
+          <section id="projects" className="bg-[#050505] py-28 md:py-36 border-t border-white/[0.05] relative overflow-hidden">
+            <div className="max-w-6xl mx-auto px-6 relative mb-20">
+              <Reveal className="flex flex-col md:flex-row items-end justify-between gap-8 md:gap-24 relative">
+                <div className="relative flex-1">
                   <span className="text-blue-400 tracking-[0.3em] text-[10px] md:text-xs uppercase font-bold mb-6 block">
                     SELECTED WORK
                   </span>
-                  <h2 className="text-white font-black text-5xl md:text-6xl tracking-tighter leading-[1.1] whitespace-pre-line">
+                  <h2 className="text-white font-black text-5xl md:text-7xl tracking-tighter leading-none mb-4">
                     {"Things I\nActually Built."}
                   </h2>
                 </div>
+                
+                <div className="relative hidden md:block">
+                   <span className="font-black text-[140px] md:text-[200px] text-white/[0.08] select-none pointer-events-none leading-none translate-y-8">
+                     03
+                   </span>
+                </div>
               </Reveal>
-
-              <div className="flex flex-col w-full border-t border-white/5">
-                {[
-                  {
-                    num: "01",
-                    name: "Project Cost & Timeline Predictor",
-                    tag: "MERN + ML",
-                    date: "Nov 2025",
-                    desc: "Full-stack application predicting project cost and delivery timelines using a trained scikit-learn model. Python ML service wired to Node.js via REST API. Secure auth + per-user prediction history in MongoDB.",
-                    tech: "React · Node.js · Express · MongoDB · Python · scikit-learn",
-                    links: ["GitHub ↗", "Live ↗"]
-                  },
-                  {
-                    num: "02",
-                    name: "File Management System",
-                    tag: "PHP + SQL",
-                    date: "Sep 2025",
-                    desc: "Web-based system handling 100+ file uploads, previews, deletions, and recovery in one interface. Resilient PHP backend with database-backed storage and server-side validation. Dark mode UI with Tailwind CSS.",
-                    tech: "HTML · Tailwind CSS · JavaScript · PHP · MySQL",
-                    links: ["GitHub ↗"]
-                  },
-                  {
-                    num: "03",
-                    name: "Last Mile Route Planning System",
-                    tag: "PHP + Maps",
-                    date: "Apr 2025",
-                    desc: "Route optimization tool for local distribution centres. Interactive JavaScript maps for real-time delivery path visualization. PHP backend handles auth, package management, and route data persistence.",
-                    tech: "PHP · JavaScript · Tailwind CSS · HTML",
-                    links: ["GitHub ↗"]
-                  }
-                ].map((proj, idx) => (
-                  <Reveal key={idx} delay={idx * 0.1} className="flex flex-col xl:flex-row items-start xl:items-center border-b border-white/[0.08] py-16 transition-all duration-500 group relative hover:bg-white/[0.02]">
-                    <div className="flex w-full items-start gap-6 md:gap-12">
-                      <span className="font-black text-6xl md:text-7xl shrink-0 w-16 md:w-24 mt-[-8px] text-white/[0.08] group-hover:text-blue-500/20 transition-colors">
-                        {proj.num}
-                      </span>
-                      <div className="flex flex-col flex-1 pl-0 md:pl-4">
-                        <div className="flex flex-wrap items-center gap-4 mb-4">
-                          <span className="text-blue-400 border border-blue-500/30 text-[10px] md:text-xs tracking-wider px-3 py-1.5 rounded-full uppercase font-semibold">
-                            {proj.tag}
-                          </span>
-                          <span className="text-white/30 text-xs tracking-widest uppercase font-medium">{proj.date}</span>
-                        </div>
-                        <h3 className="text-white font-black text-3xl md:text-4xl tracking-tight mb-4 transition-colors">
-                          {proj.name}
-                        </h3>
-                        <p className="text-white/55 text-base md:text-lg leading-[1.85] font-light max-w-2xl mb-6">
-                          {proj.desc}
-                        </p>
-                        <span className="text-white/30 text-[11px] md:text-xs tracking-[0.2em] font-medium uppercase mb-6 block">
-                          {proj.tech}
-                        </span>
-                        <div className="flex gap-6 pointer-events-auto">
-                          {proj.links.map(link => (
-                            <a key={link} href="#" className="text-white/50 text-[11px] md:text-xs font-bold uppercase tracking-[0.2em] hover:text-white transition-colors border-b border-white/20 pb-1">
-                              {link}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="hidden md:flex pr-8 shrink-0 h-full items-center justify-center opacity-0 group-hover:opacity-100 group-hover:translate-x-4 transition-all duration-300">
-                        <ArrowRight className="text-white/20 group-hover:text-white" size={40} strokeWidth={1} />
-                      </div>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
             </div>
+            
+            <div className="relative z-10 font-sans">
+              <ProjectCarousel projects={PROJECTS} />
+            </div>
+
+            {/* Subtle background glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[radial-gradient(circle,rgba(59,130,246,0.03)_0%,transparent_70%)] blur-[120px] pointer-events-none z-0" />
           </section>
 
           {/* SECTION 4: TRAINING & CREDENTIALS */}
           <section id="training" className="py-[60px] md:py-[80px] w-full border-t border-white/[0.05]">
             <div className="max-w-[1200px] mx-auto px-6 md:px-12 flex flex-col items-start relative mb-20">
                <Reveal className="absolute top-0 right-12 z-0 hidden lg:block">
-                 <span className="font-black text-[240px] text-blue-500/5 select-none pointer-events-none leading-none origin-bottom translate-y-[-20%]">
+                 <span className="font-black text-[240px] text-blue-500/[0.08] select-none pointer-events-none leading-none origin-bottom translate-y-[-20%]">
                    04
                  </span>
                </Reveal>
@@ -285,9 +228,9 @@ export default function Home() {
           {/* SECTION 5: NCC / BEYOND CODE */}
           <section id="activities" className="py-[120px] md:py-[160px] w-full border-t border-white/[0.05] relative overflow-hidden">
             <Reveal className="max-w-[1200px] mx-auto px-6 md:px-12 flex flex-col items-center justify-center relative">
-              <span className="absolute top-[-60px] md:top-[-80px] left-4 md:left-24 font-black text-[180px] md:text-[240px] leading-none select-none pointer-events-none font-serif text-blue-500/10">
-                &quot;
-              </span>
+               <span className="absolute top-[-60px] md:top-[-80px] left-4 md:left-24 font-black text-[180px] md:text-[240px] leading-none select-none pointer-events-none font-serif text-blue-500/[0.15]">
+                 05
+               </span>
               <span className="text-blue-400 tracking-[0.3em] text-[10px] md:text-xs uppercase font-bold mb-10 relative z-10 text-center">BEYOND THE CODE</span>
               <p className="text-white/70 text-2xl md:text-4xl font-light leading-[1.8] md:leading-[1.7] max-w-4xl text-center italic relative z-10 tracking-wide">
                 Three years in the NCC Army Wing. B &amp; C Certificate holder. 
@@ -305,8 +248,13 @@ export default function Home() {
           </section>
 
           {/* SECTION 6: CONTACT CTA */}
-          <section id="contact" className="min-h-[70vh] w-full flex flex-col items-center justify-center relative border-t border-white/[0.08]">
-            <div className="flex flex-col items-center justify-center w-full px-6 z-10 mt-16 pb-32">
+           <section id="contact" className="min-h-[70vh] w-full flex flex-col items-center justify-center relative border-t border-white/[0.08]">
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-10 pointer-events-none select-none">
+               <span className="font-black text-[200px] md:text-[300px] text-white/[0.05]">
+                 06
+               </span>
+             </div>
+             <div className="flex flex-col items-center justify-center w-full px-6 z-10 mt-16 pb-32">
               <Reveal>
                 <span className="text-blue-400 tracking-[0.4em] text-[10px] md:text-xs uppercase font-bold mb-8 block text-center">READY TO BUILD</span>
               </Reveal>
