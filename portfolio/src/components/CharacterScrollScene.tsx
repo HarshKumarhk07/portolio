@@ -201,7 +201,7 @@ export default function CharacterScrollScene({ onAnimationComplete }: CharacterS
   
   const isActiveRef = useRef(false);
   const lastRenderedFrameRef = useRef(-1);
-  const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const settleTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const rafIdRef = useRef<number>(0);
   const hasHeldRef = useRef(false);
   const lastProgressRef = useRef(0);

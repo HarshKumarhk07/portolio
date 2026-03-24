@@ -133,7 +133,7 @@ const ProjectStackedScene: React.FC = () => {
       tl.to(cards, {
         y: (i) => -((cards.length - 1 - i) * 10), 
         scale: (i) => 0.86 + (i * 0.02), 
-        opacity: isMobile ? (i === cards.length - 1 ? 1 : 0) : 0.6, 
+        opacity: (i: number) => isMobile ? (i === cards.length - 1 ? 1 : 0) : 0.6, 
         stagger: 0.03,
         duration: 0.4,
         ease: "power2.out"
